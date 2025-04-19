@@ -1,4 +1,4 @@
-# Serverless Stock Data Pipeline with AWS
+# Semiconductor Stock Data Pipeline with AWS
 
 This project implements a **serverless data pipeline** using AWS services to ingest, transform, and visualize daily semiconductor stock data. It pulls data from the [Alpha Vantage API](https://www.alphavantage.co/) and enables querying through Athena and dashboarding with Grafana.
 
@@ -25,9 +25,18 @@ This project implements a **serverless data pipeline** using AWS services to ing
     -   {symbol} is a variable used in Lambda function
 
 3. AWS Lambda Function
-    - Retrieves data from Alpha Vantage and stores CSV files in S3.
-    - Configured IAM role with AmazonS3FullAccess and AmazonKinesisFirehoseFullAccess.
-    - Introduced time.sleep(15) between API calls to comply with the free-tier limit of 5 calls/min.
+
+### Historical Backfill Function
+
+#### `historical_stock_price_lambda`
+- One-time Lambda function used to **retrieve historical stock data** from Alpha Vantage.
+- Converts the data into CSV format and saves it into the appropriate S3 path (`/army-sc-bucket/`).
+- Used to seed the dataset before setting up the automated daily ingestion pipeline.
+
+## Daily ingestion
+- Retrieves **daily data** from Alpha Vantage and stores JSON files in S3.
+- Configured IAM role with AmazonS3FullAccess and AmazonKinesisFirehoseFullAccess.
+- Introduced time.sleep(15) between API calls to comply with the free-tier limit of 5 calls/min.
 
 4. EventBridge Trigger
     - Used Amazon EventBridge to trigger Lambda execution:
@@ -54,17 +63,20 @@ This project implements a **serverless data pipeline** using AWS services to ing
     - Written in Python with embedded SQL logic.
     - Tasks include:
         - Dropping old temporary tables
-        - Creating new temporary tables
-        - Running data quality checks
-        - Publishing final tables in Parquet format
+        - Creating new temporary tables -> table stored in parquet bucket and output into query results bucket
+        - Running data quality checks on parquet table
+        - Publishing final tables in Parquet format -> table published in proc bucket
 
-    -Jobs for Prod table is designed for incremental inserts:
+    -Jobs for Prod table is designed for **incremental inserts**:
         - If the table exists → append new data.
         - If not → create the table dynamically.
 
 3. AWS Glue Workflows (write -> audit -> publish -> pattern)
     - Orchestrates ETL jobs using a defined sequence: on demand trigger -> Crawler: Load data from S3 -> Delete temporary tables -> Create temporary tables -> Data quality check ->   Publish final tables
     - Between each job, a trigger is added and logic configured to "Start after ANY watched event", so a job will only run if the previous job runs successfully
+  
+<img width="739" alt="workflow 1" src="https://github.com/user-attachments/assets/90cfa289-37cd-478b-af7a-3b7862e24116" />
+<img width="647" alt="workflow 2" src="https://github.com/user-attachments/assets/812e49ea-9d65-46d2-babf-f1efd567b784" />
   
 # Data Visualization
 - Grafana Setup
@@ -88,6 +100,27 @@ This project implements a **serverless data pipeline** using AWS services to ing
 # Volatility
 <img width="814" alt="Volatility" src="https://github.com/user-attachments/assets/b012a8a9-4730-4af9-a8ae-0262fc22e938" />
 
+### Analysis & Observations
+
+- **Average Price:**
+  - The average price across tracked stocks **reached a low on 4/7–4/8**.
+  - This was followed by a notable **rebound on 4/9**, suggesting a possible market correction or reaction to external events.
+
+- **Daily Return:**
+  - Daily return metrics hit a **trough on 4/8** and then **peaked on 4/9**, showing a sharp swing in sentiment or value.
+
+- **Volatility:**
+  - Volatility spiked **on 4/9**, indicating heightened uncertainty or rapid market movement during that time.
+
+- **Correlated Movement Across Top Stocks:**
+  - The top 10 stocks by market share demonstrated nearly identical movement patterns, implying a systemic or macro-level influence.
+  - This alignment across major stocks supports the deduction that a broad market catalyst occurred.
+
+- **Market Impact Hypothesis:**
+  - The timing aligns with the **tariff announcement on 4/5**, which likely caused:
+    - Market uncertainty leading into the weekend
+    - A price drop and return trough on 4/8 (first trading day after)
+    - A volatility spike and price rebound on 4/9, as investors reacted
  
 ##  Troubleshooting & Testing
 
@@ -148,4 +181,7 @@ Planned enhancements:
 | `candle_type`        | Candlestick pattern classification (e.g., doji, hammer)      |
 | `is_market_up`       | Boolean indicating if stock closed higher than it opened      
 
+### Ingest data for stocks outside of US market
+- Multinational comparison for semiconductor stock market
+- Set up EventTrigger to run it multiple times a day to accommodate different stock market hours
 
