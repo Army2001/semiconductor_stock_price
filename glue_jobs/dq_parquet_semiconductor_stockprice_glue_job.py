@@ -1,4 +1,5 @@
 import sys
+import awswrangler as wr
 
 # This check counts NULLs in avg_daily_price and daily_return
 NULL_DQ_CHECK = """
