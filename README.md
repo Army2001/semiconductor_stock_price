@@ -17,7 +17,7 @@ This project implements a **serverless data pipeline** using AWS services to ing
 ## Data Ingestion
 1. S3 Bucket Setup
     - Created an S3 bucket to store raw and processed stock data.
-    - Structured folders (e.g., /raw/, /query_results/) for organizing batches of files needed for Athena.
+    - Structured folders (e.g., /army-sc-bucket/, /army-sc-query-results-bucket/) for organizing batches of files needed for Athena.
 
 2. Alpha Vantage API Integration
     - API Endpoint:
