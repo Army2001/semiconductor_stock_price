@@ -103,11 +103,11 @@ This project implements a **serverless data pipeline** using AWS services to ing
 ### Analysis & Observations
 
 - **Average Price:**
-  - The average price across tracked stocks **reached a low on 4/7–4/8**.
+  - The average price across tracked stocks **reached a low on 4/6–4/8**.
   - This was followed by a notable **rebound on 4/9**, suggesting a possible market correction or reaction to external events.
 
 - **Daily Return:**
-  - Daily return metrics hit a **trough on 4/8** and then **peaked on 4/9**, showing a sharp swing in sentiment or value.
+  - Daily return metrics hit a **trough on 4/7** and then **peaked on 4/8**, showing a sharp swing in sentiment or value.
 
 - **Volatility:**
   - Volatility spiked **on 4/9**, indicating heightened uncertainty or rapid market movement during that time.
