@@ -54,6 +54,8 @@ This project implements a **serverless data pipeline** using AWS services to ing
 6. CloudWatch Monitoring
     Configured a CloudWatch Alarm to detect and alert when the Lambda function fails (e.g., due to timeout or errors).
 
+<img width="758" alt="CloudWatch alarm" src="https://github.com/user-attachments/assets/c83693c1-531d-4798-91dd-d0683ddb39aa" />
+
 # Data Transformation
 1. AWS Glue Crawler
     - Scans S3 folders and builds a data catalog for Athena.
