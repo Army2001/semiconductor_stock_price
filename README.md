@@ -1,6 +1,6 @@
 # Semiconductor Stock Data Pipeline with AWS
 
-This project implements a **serverless data pipeline** using AWS services to ingest, transform, and visualize daily semiconductor stock data. It pulls data from the [Alpha Vantage API](https://www.alphavantage.co/) and enables querying through Athena and dashboarding with Grafana.
+This project implements a **serverless data pipeline** using AWS services to ingest, transform, and visualize daily semiconductor stock data. It pulls data from the [Alpha Vantage API](https://www.alphavantage.co/documentation/) and enables querying through Athena and dashboarding with Grafana.
 
 ## Architecture Overview
 
