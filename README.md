@@ -2,6 +2,24 @@
 
 This project implements a **serverless data pipeline** using AWS services to ingest, transform, and visualize daily semiconductor stock data. It pulls data from the [Alpha Vantage API](https://www.alphavantage.co/documentation/) and enables querying through Athena and dashboarding with Grafana.
 
+- [Table of Contents](#table-of-contents)
+  * [Architecture Overview](#architecture-overview)
+  * [Data Ingestion](#data-ingestion)
+      + [Historical Backfill Function](#historical-backfill-function)
+      + [Daily Ingestion](#daily-ingestion)
+          - [EventBridge Trigger](#eventbridge-trigger)
+          - [Kinesis Firehose](#kinesis-firehose)
+          - [CloudWatch Monitoring](#cloudwatch-monitoring)
+  * [Data Transformation](#data-transformation)
+      + [AWS Glue Crawler](#aws-glue-crawler)
+      + [AWS Glue ETL Jobs](#aws-glue-etl-jobs)
+      + [AWS Glue Workflows (write - audit - publish - pattern)](#aws-glue-workflows-write---audit---publish---pattern)
+  * [Data Visualization](#data-visualization)
+      + [Analysis & Observations](#analysis--observations)
+  * [Troubleshooting & Testing](#troubleshooting--testing)
+  * [Design Considerations](#design-considerations)
+  * [Future Improvements](#future-improvements)
+
 ## Architecture Overview
 
 - **Data Source**: Alpha Vantage API (`TIME_SERIES_DAILY`)
@@ -38,20 +56,20 @@ This project implements a **serverless data pipeline** using AWS services to ing
 - Configured IAM role with AmazonS3FullAccess and AmazonKinesisFirehoseFullAccess.
 - Introduced time.sleep(15) between API calls to comply with the free-tier limit of 5 calls/min.
 
-4. EventBridge Trigger
+## EventBridge Trigger
     - Used Amazon EventBridge to trigger Lambda execution:
      ```
      cron(0 22 ? * MON-FRI *)
      ```
     - Runs Monday–Friday at 10:00 PM UTC, after the U.S. stock market closes.
 
-5. Kinesis Firehose
+## Kinesis Firehose
     Buffers and streams data to S3 when either:
         5 MiB of data is received, or
         60 seconds have passed.
     Configured to invoke the Lambda function and deliver streaming data into a nested S3 path.
 
-6. CloudWatch Monitoring
+## CloudWatch Monitoring
     Configured a CloudWatch Alarm to detect and alert when the Lambda function fails (e.g., due to timeout or errors).
 
 <img width="758" alt="CloudWatch alarm" src="https://github.com/user-attachments/assets/c83693c1-531d-4798-91dd-d0683ddb39aa" />
